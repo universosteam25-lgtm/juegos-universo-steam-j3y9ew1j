@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>Diagnóstico · Universo STEAM</title>
+<style>body{font-family:Arial,sans-serif;background:#F8F6FF;color:#3d2b7a;margin:0 auto;padding:18px;max-width:640px}h1{color:#6B4FE0;font-size:22px}.r{background:#fff;border:2px solid #E0D9FF;border-radius:14px;padding:10px 12px;margin:8px 0;font-size:15px;word-break:break-word}.ok{border-color:#2bb77a}.no{border-color:#d6336c;background:#fff0f5}.w{border-color:#e0a800;background:#fff8e1}button{border:0;border-radius:14px;padding:12px 18px;background:#9C88FF;color:#fff;font-size:16px;font-weight:700;margin:6px 6px 6px 0}[hidden]{display:none}</style></head><body>
+<h1>🩺 Diagnóstico de conexión</h1><p>Espera unos segundos. Al terminar pulsa «Copiar resultado» y envíalo a Universo STEAM.</p><div id="o"></div><button id="cp" hidden>📋 Copiar resultado</button><button onclick="location.reload()">🔄 Repetir</button>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+(async()=>{
+const CFG={apiKey:"AIzaSyBZXPso82OVPBHlDx-E0Fnbl7opWGX6Vvc",authDomain:"asistencia-steam-be075.firebaseapp.com",projectId:"asistencia-steam-be075",storageBucket:"asistencia-steam-be075.firebasestorage.app",messagingSenderId:"566010898493",appId:"1:566010898493:web:7992ba62382c74fd47a254"};
+const o=document.getElementById('o'),out=[],I={ok:'✅ ',no:'❌ ',w:'⚠️ ',r:'ℹ️ '};
+const add=(c,t)=>{out.push(I[c]+t);const d=document.createElement('div');d.className='r '+c;d.textContent=I[c]+t;o.appendChild(d);};
+const T=(p,ms)=>Promise.race([p,new Promise((_,n)=>setTimeout(()=>n(new Error('tiempo agotado ('+ms/1000+' s)')),ms))]);
+const er=e=>(e&&(e.code||e.message))||String(e);
+add('r','Fecha: '+new Date().toLocaleString('es-CO')+' · Página: '+location.href.split('#')[0]);
+add('r','Navegador: '+navigator.userAgent.slice(0,120));
+add(navigator.onLine?'ok':'no','Internet del dispositivo: '+(navigator.onLine?'conectado':'SIN conexión'));
+if(/FBAN|FBAV|FB_IAB|Instagram|TikTok|musical_ly|Snapchat|MicroMessenger|Line\//i.test(navigator.userAgent))add('w','Estás dentro de otra app (Instagram/Facebook/TikTok…). Abre el enlace en Chrome o Safari.');
+let lic=null;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');add('ok','Almacenamiento del navegador: funciona');lic=JSON.parse(localStorage.getItem('steamjuegos_lic')||'null');}catch(e){add('no','Almacenamiento bloqueado ('+er(e)+'). Sal del modo incógnito/privado.');}
+try{const r=await T(navigator.serviceWorker.getRegistrations(),4000);add(r.length?'ok':'w','Modo sin conexión (service worker): '+(r.length?'instalado':'aún no instalado'));}catch(e){add('w','Service worker no disponible: '+er(e));}
+try{const r=await T(fetch('games/catalog.json',{cache:'no-store'}),10000);add(r.ok?'ok':'no','Página de juegos en GitHub: '+(r.ok?'accesible':'error HTTP '+r.status));}catch(e){add('no','No se pudo abrir la página de juegos en GitHub: '+er(e));}
+if(typeof firebase==='undefined'){add('no','No cargó Firebase (www.gstatic.com bloqueado por esta red). Prueba con otra red o datos móviles.');}
+else{
+ add('ok','Firebase cargó');let u=null,db=null;
+ try{const a=firebase.initializeApp(CFG,'juegos');db=a.firestore();try{db.settings({experimentalAutoDetectLongPolling:true,merge:true});}catch(e){}
+  u=await T(new Promise(ok=>{const off=a.auth().onAuthStateChanged(x=>{off();ok(x);});}),10000);
+  if(!u)u=(await T(a.auth().signInAnonymously(),15000)).user;
+  add('ok','Sesión anónima: '+u.uid.slice(0,6)+'…');}
+ catch(e){add('no','No se pudo iniciar sesión anónima: '+er(e)+' (¿acceso anónimo desactivado o clave de API restringida?)');}
+ if(db){
+  try{const d=await T(db.doc('catalog/games').get(),15000);add('ok','Catálogo en la nube: '+(d.exists?(d.data().list||[]).length+' juegos':'vacío'));}catch(e){add('no','No se pudo leer el catálogo en la nube: '+er(e));}
+  if(!lic)add('r','Este dispositivo todavía no tiene un código activado.');
+  else if(u){
+   add(lic.uid===u.uid?'ok':'no','Sesión del código: '+(lic.uid===u.uid?'coincide con este dispositivo':'CAMBIÓ (el código quedó ligado a otra sesión: pide que lo liberen)'));
+   try{const d=await T(db.doc('codes/'+lic.code).get(),15000),c=d.exists?d.data():null;add(c&&c.status==='active'&&c.uid===u.uid?'ok':'no','Código ••••'+lic.code.slice(-4)+': '+(!c?'no existe':c.status!=='active'?'desactivado':c.uid===u.uid?'activo en este dispositivo':'ligado a OTRO dispositivo/navegador'));}catch(e){add('no','No se pudo verificar el código: '+er(e));}
+   try{const k=await T(db.doc('gamekey/master').get(),15000);add(k.exists?'ok':'no','Clave de los juegos: '+(k.exists?'accesible':'no configurada'));}catch(e){add('no','Clave de los juegos NO accesible: '+er(e));}
+  }
+ }
+}
+const b=document.getElementById('cp');b.hidden=false;b.onclick=async()=>{const t=out.join('\n');try{await navigator.clipboard.writeText(t);b.textContent='✅ Copiado';}catch(e){prompt('Copia este texto:',t);}};
+})();
+</script></body></html>
