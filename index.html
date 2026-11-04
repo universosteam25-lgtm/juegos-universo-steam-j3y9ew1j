@@ -82,17 +82,27 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 .campImg{width:100%;max-height:210px;object-fit:cover;border-radius:18px;margin:10px 0 2px;display:block}
 .campD{font-size:14px;font-weight:600;color:var(--tx);margin:4px 0 6px;white-space:pre-wrap;text-align:left}
 .okmsg{color:#1b8a5a;font-weight:700;font-size:14px;margin-top:10px;text-align:center}
-.fichas{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-.ficha{position:relative;min-height:200px;border:0;border-radius:28px;padding:16px;color:#fff;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;background-size:cover;background-position:center;box-shadow:0 8px 22px rgba(60,40,140,.28);font-family:Quicksand,Arial,sans-serif;overflow:hidden}
-.ficha:active{transform:scale(.98)}
-.ficha .fl{position:absolute;top:10px;left:16px;font:700 56px/1 Fredoka,sans-serif;text-shadow:0 3px 0 rgba(0,0,0,.25)}
-.ficha .fn{font:600 24px Fredoka,sans-serif;text-shadow:0 2px 6px rgba(0,0,0,.45)}
-.ficha .fm{font-size:12.5px;font-weight:700;line-height:1.35;text-shadow:0 1px 4px rgba(0,0,0,.6)}
-.ficha .fc{align-self:flex-start;background:rgba(255,255,255,.28);border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700;margin-top:4px}
-.stT{font-family:Fredoka,sans-serif;margin:4px 0 8px;font-size:26px}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;position:sticky;top:0;z-index:5;background:var(--bg)}
-.tab{flex:none;border:2px solid var(--soft);background:var(--card);color:var(--tx);border-radius:99px;padding:8px 14px;font:600 14px Fredoka,sans-serif;cursor:pointer}
-.tab.on{background:var(--p);border-color:var(--p);color:#fff}.tab i{font-style:normal;opacity:.7;font-size:12px}
+
+.fichas{display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
+.ficha{width:min(250px,calc(50% - 7px));aspect-ratio:1/1;container-type:size;background:var(--fp);border:0;border-radius:24px;cursor:pointer;position:relative;box-shadow:0 8px 22px rgba(0,0,0,.12);transition:transform .15s,box-shadow .15s;padding:0;font:inherit;color:inherit}
+.ficha:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.18)}.ficha:active{transform:scale(.97)}
+.fIn{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5cqw 6cqw;gap:2.2cqw}
+.fCir{width:42cqw;height:42cqw;flex:0 0 auto;border-radius:50%;background:#fff;box-shadow:0 1.2cqw 3cqw rgba(0,0,0,.2);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border:1cqw solid #fff}
+.fCir img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fCir b{font:700 25cqw/1 Fredoka,sans-serif;color:var(--fc)}
+.fLet{position:absolute;right:-1cqw;bottom:-1cqw;width:13cqw;height:13cqw;border-radius:50%;background:var(--fc);color:#fff;font:700 8cqw/13cqw Fredoka,sans-serif;text-align:center;border:1cqw solid #fff}
+.fName{font:700 8.4cqw/1 Fredoka,sans-serif;color:var(--fc)}
+.fSubj{font:700 4.1cqw/1.25 Quicksand,sans-serif;color:#4b3a7a}
+.fCount{position:absolute;top:3.5cqw;right:3.5cqw;background:#fff;color:var(--fc);font:700 4.2cqw Fredoka,sans-serif;border-radius:99px;padding:1cqw 3cqw}
+.qrImg{display:block;width:min(210px,100%);height:auto;margin:6px auto 0;border-radius:14px;background:#fff;padding:6px;box-shadow:0 3px 12px rgba(0,0,0,.18)}
+.dimTop{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.dimTop .btn{width:auto;padding:10px 16px;font-size:15px}
+.dimTop h2{font:700 24px Fredoka,sans-serif;margin:0}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;margin-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.tabs button{flex:0 0 auto;border:2px solid var(--soft);background:var(--card);color:var(--tx);border-radius:99px;padding:9px 16px;font:600 15px Fredoka,sans-serif;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--fc);border-color:var(--fc);color:#fff}
+.tabs button small{opacity:.8;margin-left:5px}
+.secT{font:700 18px Fredoka,sans-serif;margin:18px 0 8px;color:var(--pd)}
 </style>
 </head>
 <body>
@@ -257,9 +267,16 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 
 <section id="vLib" hidden>
   <div class="warn" id="needVerify" hidden>Hace tiempo que no verificamos tu código. Conéctate a internet para seguir jugando.</div>
-  <div id="steamHome"></div>
-  <div id="steamRoom" hidden><button class="btn ghost" id="stBack" style="margin-bottom:10px">← Todas las fichas</button><div id="stHead"></div><div class="tabs" id="stTabs"></div></div>
-  <div class="grid" id="grid" hidden></div>
+  <div id="home">
+    <p class="hint" style="text-align:center;margin:0 0 12px">Elige una ficha para ver sus asignaturas y juegos.</p>
+    <div class="fichas" id="fichas"></div>
+    <div id="otros" hidden><p class="secT">🎮 Más juegos</p><div class="grid" id="gridOtros"></div></div>
+  </div>
+  <div id="dimv" hidden>
+    <div class="dimTop"><button class="btn ghost" id="dimBack">← Fichas</button><h2 id="dimT"></h2></div>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div class="grid" id="grid"></div>
+  </div>
   <div class="card" style="margin-top:16px">
     <div class="row">
       <button class="btn alt" id="inst" hidden>📲 Instalar en este dispositivo</button>
@@ -293,7 +310,7 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 
 <div id="player" hidden>
   <div id="pbar"><button id="pback">← Volver</button><span id="ptitle"></span></div>
-  <iframe id="frame" title="Juego" sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-pointer-lock allow-orientation-lock" allow="fullscreen; autoplay; gamepad; accelerometer; gyroscope; clipboard-write"></iframe>
+  <iframe id="frame" title="Juego" sandbox="allow-scripts allow-same-origin allow-modals allow-forms" allow="fullscreen; autoplay"></iframe>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -303,15 +320,11 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 (function(){
 const CFG={apiKey:"AIzaSyBZXPso82OVPBHlDx-E0Fnbl7opWGX6Vvc",authDomain:"asistencia-steam-be075.firebaseapp.com",projectId:"asistencia-steam-be075",storageBucket:"asistencia-steam-be075.firebasestorage.app",messagingSenderId:"566010898493",appId:"1:566010898493:web:7992ba62382c74fd47a254"};
 const LS='steamjuegos_lic',OFFLINE_DAYS=45,CACHE='steam-juegos-v1';
-const DONA={nequi:'',breb:'@NEQUIJHE517',vaki:'',nota:'Tu aporte es voluntario y ayuda a comprar materiales y premios, y a apoyar becas del taller.'};
+const DONA={nequi:'',breb:'0093839043',nombre:'Universo steam laura diaz',qr:'qr-donar.png',vaki:'',nota:'Tu aporte es voluntario y ayuda a comprar materiales y premios, y a apoyar becas del taller.'};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const b64u8=b=>Uint8Array.from(atob(b),c=>c.charCodeAt(0));
-let lic=null,CAT=[],db=null,auth=null,cur=null,deferred=null,dim=null,sub='*',COV={},catErr='';
-const STEAM={S:{n:'Ciencia',e:'🔬',c:'#2BB7C9',m:['Biología','Física','Química','Historia','Geografía','Ciencias Sociales','Economía y Política']},T:{n:'Tecnología',e:'💻',c:'#5B6CFF',m:['Informática','Sistemas y Tecnología']},E:{n:'Ingeniería',e:'📐',c:'#FF9F43',m:['Dibujo Técnico']},A:{n:'Arte',e:'🎨',c:'#FF6B9D',m:['Lengua Castellana','Lectura Crítica','Inglés','Filosofía','Democracia y Constitución','Artes','Ética y Valores','Educación Religiosa','Cátedra de la Paz','Educación Física','Recreación y Deportes']},M:{n:'Matemáticas',e:'🧮',c:'#9C88FF',m:['Aritmética','Álgebra','Trigonometría','Cálculo','Geometría','Estadística']}};
-const OTROS={n:'Otros juegos',e:'🎮',c:'#7a6fb0',m:[]},FI=k=>k==='O'?OTROS:STEAM[k];
-const gamesOf=k=>CAT.map((g,i)=>[g,i]).filter(([g])=>k==='O'?!STEAM[g.dim]:g.dim===k);
-const covStyle=k=>COV[k]&&/^data:image\/jpeg;base64,/.test(COV[k])?'background-image:linear-gradient(0deg,rgba(0,0,0,.62),rgba(0,0,0,.05) 65%),url('+COV[k]+')':'background:linear-gradient(135deg,'+FI(k).c+','+FI(k).c+'aa)';
+let lic=null,CAT=[],db=null,auth=null,cur=null,deferred=null;
 const getLic=()=>{try{return JSON.parse(localStorage.getItem(LS)||'null');}catch(e){return null;}};
 const setLic=v=>{try{v?localStorage.setItem(LS,JSON.stringify(v)):localStorage.removeItem(LS);}catch(e){}};
 const normCode=s=>String(s).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12).replace(/(.{4})(?=.)/g,'$1-');
@@ -332,7 +345,7 @@ async function activate(){
     if(!d.exists)return fail('Ese código no es válido. Revísalo e inténtalo de nuevo.');
     const c=d.data();
     if(c.status!=='active')return fail('Este código está desactivado. Comunícate con Universo STEAM.');
-    if(c.uid&&c.uid!==u.uid)return fail('Este código ya está activo en otro dispositivo o navegador. Si es el tuyo (cambiaste de navegador o borraste datos), pide a Universo STEAM que lo libere.');
+    if(c.uid&&c.uid!==u.uid)return fail('Este código ya está activo en otro dispositivo. Pide a Universo STEAM que lo libere.');
     await ref.update({uid:u.uid,claimedAt:Date.now()});
     await db.doc('licenses/'+u.uid).set({code});
     const k=await db.doc('gamekey/master').get();
@@ -359,63 +372,79 @@ async function isCached(g){try{const c=await caches.open(CACHE);return !!(await 
 async function getBytes(g){
   if(g.file){const r=await fetch('games/'+g.file);if(!r.ok)throw new Error('no se pudo cargar');return await r.arrayBuffer();}
   const c=await caches.open(CACHE),hit=await c.match(ckey(g));if(hit)return await hit.arrayBuffer();
-  if(!db||!navigator.onLine)throw new Error('sin conexión');
-  await authReady();const parts=[];
-  for(let i=0;i<g.n;i++){const d=await db.doc('gamedata/'+g.id+'_'+g.v+'_'+i).get();if(!d.exists)throw new Error('falta una parte del juego');parts.push(b64u8(d.data().b));}
-  const all=new Uint8Array(parts.reduce((a,p)=>a+p.length,0));let o=0;parts.forEach(p=>{all.set(p,o);o+=p.length;});
-  await c.put(ckey(g),new Response(all.buffer));return all.buffer;
+  try{
+    if(!db||!navigator.onLine)throw new Error('sin conexión');
+    await authReady();const parts=[];
+    for(let i=0;i<g.n;i++){const d=await db.doc('gamedata/'+g.id+'_'+g.v+'_'+i).get();if(!d.exists)throw new Error('falta una parte del juego');parts.push(b64u8(d.data().b));}
+    const all=new Uint8Array(parts.reduce((a,p)=>a+p.length,0));let o=0;parts.forEach(p=>{all.set(p,o);o+=p.length;});
+    await c.put(ckey(g),new Response(all.buffer));return all.buffer;
+  }catch(e){
+    if(g.fb){const r=await fetch('games/'+g.fb);if(r.ok)return await r.arrayBuffer();}
+    throw e;
+  }
 }
 async function loadCatalog(){
-  let st=[],cl=[];catErr='';
+  let st=[],cl=[];
   try{st=await (await fetch('games/catalog.json')).json();}catch(e){}
   try{cl=JSON.parse(localStorage.getItem('steamjuegos_cat')||'[]');}catch(e){}
-  if(db&&navigator.onLine){try{
-    await Promise.race([authReady(),new Promise((_,n)=>setTimeout(()=>n(new Error('tiempo agotado al conectar')),12000))]);
-    const d=await db.doc('catalog/games').get();
-    if(d.exists){cl=d.data().list||[];try{localStorage.setItem('steamjuegos_cat',JSON.stringify(cl));}catch(e){}}
-  }catch(e){catErr=e.code||e.message||'error';}}
+  if(db&&navigator.onLine){try{const d=await db.doc('catalog/games').get();if(d.exists){cl=d.data().list||[];try{localStorage.setItem('steamjuegos_cat',JSON.stringify(cl));}catch(e){}}}catch(e){}}
   const ids=new Set(cl.map(g=>g.id));
-  CAT=[...st.filter(g=>!ids.has(g.id)),...cl.filter(g=>g.on!==false).sort((a,b)=>(a.order||0)-(b.order||0)).map(g=>Object.assign({},g,{cloud:true}))];
-}
-async function loadCovers(){
-  let m={};try{m=JSON.parse(localStorage.getItem('steamjuegos_covm')||'{}');COV=JSON.parse(localStorage.getItem('steamjuegos_cov')||'{}');}catch(e){}
-  if(db&&navigator.onLine){try{
-    const d=await db.doc('catalog/steam').get(),ver=d.exists?(d.data().ver||{}):{};
-    for(const k of Object.keys(STEAM)){
-      if(!ver[k]){delete COV[k];delete m[k];continue;}
-      if(String(m[k])!==String(ver[k])||!COV[k]){const x=await db.doc('catalog/steam_'+k).get();if(x.exists){COV[k]=x.data().b;m[k]=ver[k];}}}
-    try{localStorage.setItem('steamjuegos_cov',JSON.stringify(COV));localStorage.setItem('steamjuegos_covm',JSON.stringify(m));}catch(e){}
-  }catch(e){}}
+  CAT=[...st.filter(g=>!ids.has(g.id)),...cl.filter(g=>g.on!==false).sort((a,b)=>(a.order||0)-(b.order||0)).map(g=>Object.assign({},g,{cloud:true,fb:(st.find(x=>x.id===g.id)||{}).file,subs:g.subs||(st.find(x=>x.id===g.id)||{}).subs,subj:g.subj||(st.find(x=>x.id===g.id)||{}).subj}))];
 }
 async function prefetch(){
   const st=$('dl');let ok=0;
   for(const g of CAT){try{if(await isCached(g)){ok++;}else{await getBytes(g);ok++;}}catch(e){}st.textContent='Guardando juegos para usarlos sin internet… '+ok+'/'+CAT.length;}
   st.textContent=ok===CAT.length&&CAT.length?'✅ Todos los juegos están guardados: puedes jugar sin internet.':'⚠️ Faltan juegos por guardar. Conéctate a internet una vez más.';
 }
-function renderLib(){
-  const ks=Object.keys(STEAM).concat(CAT.some(g=>!STEAM[g.dim])?['O']:[]),room=!!dim&&ks.includes(dim);
-  $('steamHome').hidden=room;$('steamRoom').hidden=!room;$('grid').hidden=!room;
-  if(!room){dim=null;
-    $('steamHome').innerHTML=(catErr&&!CAT.some(g=>g.cloud)?'<div class="warn">⚠️ No se pudieron cargar los juegos de la nube ('+esc(catErr)+'). Revisa tu conexión e inténtalo de nuevo.</div>':'')+'<div class="fichas">'+ks.map(k=>{const f=FI(k),n=gamesOf(k).length;return '<button class="ficha" data-k="'+k+'" style="'+covStyle(k)+'"><span class="fl">'+(k==='O'?'🎮':k)+'</span><span class="fn">'+esc(f.n)+'</span><span class="fm">'+esc(f.m.join(' · '))+'</span><span class="fc">'+n+(n===1?' juego':' juegos')+'</span></button>';}).join('')+'</div>';
-    $('steamHome').querySelectorAll('.ficha').forEach(b=>b.onclick=()=>{dim=b.dataset.k;sub='*';renderLib();scrollTo(0,0);});
-  }else{
-    const f=FI(dim),L=gamesOf(dim),subs=f.m.length?f.m:[...new Set(L.map(([g])=>g.subj).filter(Boolean))];
-    $('stHead').innerHTML='<h2 class="stT" style="color:'+f.c+'">'+(dim==='O'?'🎮':dim+' – ')+esc(f.n)+'</h2>';
-    $('stTabs').innerHTML=['*'].concat(subs).map(x=>'<button class="tab'+(x===sub?' on':'')+'" data-s="'+esc(x)+'">'+(x==='*'?'Todas':esc(x)+' <i>'+L.filter(([g])=>g.subj===x).length+'</i>')+'</button>').join('');
-    $('stTabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{sub=b.dataset.s;renderLib();});
-    $('grid').innerHTML=L.filter(([g])=>sub==='*'||g.subj===sub).map(([g,i])=>'<div class="g"><div class="e" style="background:'+esc(g.color||'#9C88FF')+'22">'+esc(g.emoji||'🎮')+'</div><h3>'+esc(g.title)+'</h3><p>'+esc(g.desc||'')+'</p>'+(g.subj?'<span class="pill">'+esc(g.subj)+'</span>':'')+'<button class="btn" data-i="'+i+'">▶ Jugar</button></div>').join('')||'<div class="card hint">Aún no hay juegos en esta asignatura. ¡Pronto habrá más!</div>';
-    $('grid').querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>play(CAT[+b.dataset.i]));
-  }
-  $('lcode').textContent='••••-••••-'+lic.code.slice(-4);
+const STEAM=[
+ {k:'S',n:'Ciencia',e:'🔬',c:'#E8497A',p:'#FFC2D4',s:['Biología','Física','Química','Historia','Geografía','Ciencias Sociales','Economía y Política']},
+ {k:'T',n:'Tecnología',e:'💻',c:'#1FA3AD',p:'#B4EBEE',s:['Informática','Sistemas y Tecnología']},
+ {k:'E',n:'Ingeniería',e:'📐',c:'#C98F00',p:'#FFE8A3',s:['Dibujo Técnico']},
+ {k:'A',n:'Arte',e:'🎨',c:'#E0602B',p:'#FFCDB3',s:['Lengua Castellana','Lectura Crítica','Inglés','Filosofía','Democracia y Constitución','Artes','Ética y Valores','Educación Religiosa','Cátedra de la Paz','Educación Física','Recreación y Deportes']},
+ {k:'M',n:'Matemáticas',e:'➗',c:'#7A63E8',p:'#D5CBFF',s:['Aritmética','Álgebra','Trigonometría','Cálculo','Geometría','Estadística']}];
+const subsOf=g=>Array.isArray(g.subs)?g.subs:(g.subj?[g.subj]:[]);
+const dimOfSub=x=>(STEAM.find(d=>d.s.includes(x))||{}).k;
+let COV={},VD={d:null,s:''};
+async function loadCovers(){
+  try{COV=JSON.parse(localStorage.getItem('steamjuegos_covers')||'{}');}catch(e){COV={};}
+  if(db&&navigator.onLine){try{const d=await db.doc('catalog/covers').get();COV=d.exists?d.data():{};try{localStorage.setItem('steamjuegos_covers',JSON.stringify(COV));}catch(e){}}catch(e){}}
 }
+const dimOf=k=>STEAM.find(x=>x.k===k);
+const gamesOf=(k,sub)=>CAT.map((g,i)=>({g,i})).filter(x=>subsOf(x.g).some(y=>dimOfSub(y)===k&&(!sub||y===sub)));
+function gameCard(g,i){return '<div class="g"><div class="e" style="background:'+esc(g.color||'#9C88FF')+'22">'+esc(g.emoji||'🎮')+'</div><h3>'+esc(g.title)+'</h3><p>'+esc(g.desc||'')+'</p><button class="btn" data-i="'+i+'">▶ Jugar</button></div>';}
+function bindPlay(root){root.querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>play(CAT[+b.dataset.i]));}
+function renderHome(){
+  $('fichas').innerHTML=STEAM.map(d=>{const n=gamesOf(d.k).length,img=COV[d.k]&&/^data:image\//.test(COV[d.k])?'<img alt="" src="'+COV[d.k]+'">':'';
+    return '<button class="ficha" data-k="'+d.k+'" style="--fc:'+d.c+';--fp:'+d.p+'"><div class="fIn"><div class="fCir">'+(img?img+'<span class="fLet">'+d.k+'</span>':'<b>'+d.k+'</b>')+'</div><div class="fName">'+d.n+'</div><div class="fSubj">'+d.s.map(esc).join(' · ')+'</div></div><span class="fCount">'+n+' juego'+(n===1?'':'s')+'</span></button>';}).join('');
+  $('fichas').querySelectorAll('.ficha').forEach(b=>b.onclick=()=>openDim(b.dataset.k,true));
+  const otros=CAT.map((g,i)=>({g,i})).filter(x=>!subsOf(x.g).some(y=>dimOfSub(y)));
+  $('otros').hidden=!otros.length;$('gridOtros').innerHTML=otros.map(x=>gameCard(x.g,x.i)).join('');bindPlay($('gridOtros'));
+}
+function renderDim(){
+  const d=dimOf(VD.d);if(!d)return;const dv=$('dimv');dv.style.setProperty('--fc',d.c);
+  $('dimT').textContent=d.k+' · '+d.n;$('dimT').style.color=d.c;
+  const tabs=[{s:'',l:'Todas',n:gamesOf(d.k).length},...d.s.map(x=>({s:x,l:x,n:gamesOf(d.k,x).length}))];
+  $('tabs').innerHTML=tabs.map(t=>'<button role="tab" class="'+(VD.s===t.s?'on':'')+'" data-s="'+esc(t.s)+'" style="'+(t.n?'':'opacity:.55')+'">'+esc(t.l)+'<small>'+t.n+'</small></button>').join('');
+  $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{VD.s=b.dataset.s;renderDim();});
+  const L=gamesOf(d.k,VD.s);
+  $('grid').innerHTML=L.length?L.map(x=>gameCard(x.g,x.i)).join(''):'<div class="card hint" style="grid-column:1/-1;text-align:center">Pronto habrá juegos de '+esc(VD.s||d.n)+' ✨</div>';
+  bindPlay($('grid'));
+  const on=$('tabs').querySelector('button.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
+}
+function openDim(k,push){VD={d:k,s:''};$('home').hidden=true;$('dimv').hidden=false;renderDim();window.scrollTo(0,0);if(push)history.pushState({d:k},'');}
+function goHome(){VD={d:null,s:''};$('dimv').hidden=true;$('home').hidden=false;renderHome();window.scrollTo(0,0);}
+function renderLib(){
+  $('lcode').textContent='••••-••••-'+lic.code.slice(-4);
+  if(VD.d)renderDim();else renderHome();
+}
+const donaExtra=()=>(DONA.nombre?'<p class="hint" style="margin:10px 0 0">Al pagar verás el nombre <b>«'+esc(DONA.nombre)+'»</b>.</p>':'')+(DONA.qr?'<p class="hint" style="margin:12px 0 4px">O escanea este código QR con la app de tu banco o billetera:</p><img class="qrImg" alt="Código QR para donar por Bre-B" src="'+esc(DONA.qr)+'">':'');
 function renderDona(){
   const D=DONA;$('donaTxt').textContent=D.nota||'';let h='';
-  if(D.breb)h+='<p class="hint">Por <b>Bre-B</b> (desde cualquier banco o billetera), paga a la llave: <span class="pill" style="font-size:17px">'+esc(D.breb)+'</span></p><button class="btn alt" id="cpBreb">📋 Copiar llave Bre-B</button>';
-  if(D.nequi)h+='<p class="hint" style="margin-top:14px">O por <b>Nequi</b>, envía al número: <span class="pill" style="font-size:17px">'+esc(D.nequi.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'))+'</span></p><button class="btn ghost" id="cpNeq">📋 Copiar número</button>';
+  if(D.breb)h+='<p class="hint">Por <b>Bre-B</b> (desde cualquier banco o billetera), paga a la llave: <span class="pill" style="font-size:17px">'+esc(D.breb)+'</span></p><button class="btn alt" id="cpBreb">📋 Copiar llave Bre-B</button>'+donaExtra();
   if(D.vaki)h+='<a class="btn alt" style="text-decoration:none;text-align:center;margin-top:12px" target="_blank" rel="noopener" href="'+esc(D.vaki)+'">Aportar</a>';
   if(!h)h='<p class="hint">Muy pronto podrás aportar.</p>';
   $('donaBox').innerHTML=h;
-  [['cpBreb',D.breb,'✅ Llave copiada'],['cpNeq',D.nequi,'✅ Número copiado']].forEach(([id,v,ok])=>{const c=$(id);if(c)c.onclick=async()=>{try{await navigator.clipboard.writeText(v);c.textContent=ok;}catch(e){prompt('Copia aquí:',v);}};});
+  [['cpBreb',D.breb,'✅ Llave copiada']].forEach(([id,v,ok])=>{const c=$(id);if(c)c.onclick=async()=>{try{await navigator.clipboard.writeText(v);c.textContent=ok;}catch(e){prompt('Copia aquí:',v);}};});
 }
 const fmtPct=p=>String(p).replace('.',',')+'%';
 const fmtFecha=t=>new Date(t).toLocaleString('es-CO',{dateStyle:'long',timeStyle:'short'});
@@ -452,7 +481,7 @@ const hasDona=()=>!!(DONA.breb||DONA.vaki||DONA.nequi);
 function openAnun(det){
   $('anTxt').textContent=DONA.nota||'';$('anDet').hidden=!det;$('anTxt').hidden=!!det;
   if(det){let h='';
-    if(DONA.breb)h+='<p class="hint" style="margin:0 0 8px">Paga por <b>Bre-B</b> desde cualquier banco o billetera, a la llave:</p><div class="pill" style="font-size:20px;padding:8px 16px">'+esc(DONA.breb)+'</div><button class="btn alt" id="anCp">📋 Copiar llave Bre-B</button>';
+    if(DONA.breb)h+='<p class="hint" style="margin:0 0 8px">Paga por <b>Bre-B</b> desde cualquier banco o billetera, a la llave:</p><div class="pill" style="font-size:20px;padding:8px 16px">'+esc(DONA.breb)+'</div><button class="btn alt" id="anCp">📋 Copiar llave Bre-B</button>'+donaExtra();
     if(DONA.vaki)h+='<a class="btn alt" style="text-decoration:none;text-align:center" target="_blank" rel="noopener" href="'+esc(DONA.vaki)+'">Aportar</a>';
     h+='<p class="hint" style="margin:12px 0 0">¡Gracias por apoyar a Universo STEAM! 💜</p>';
     $('anDet').innerHTML=h;const c=$('anCp');
@@ -462,7 +491,7 @@ function openAnun(det){
 function closeAnun(){$('anun').hidden=true;if(hasDona())$('fabDona').hidden=false;}
 $('anDonar').onclick=()=>openAnun(true);$('anCerrar').onclick=closeAnun;$('fabDona').onclick=()=>{openAnun(true);loadCamp();};
 $('anun').addEventListener('click',e=>{if(e.target.id==='anun')closeAnun();});
-async function enter(){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}view('lib');$('steamHome').hidden=false;$('steamRoom').hidden=true;$('grid').hidden=true;$('steamHome').innerHTML='<div class="card hint">Cargando juegos…</div>';await loadCatalog();await loadCovers();renderLib();revalidate();prefetch();}
+function enter(){view('lib');renderLib();revalidate();prefetch();}
 async function decrypt(buf,kb64){
   const key=await crypto.subtle.importKey('raw',b64u8(kb64),'AES-GCM',false,['decrypt']);
   const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:buf.slice(0,12)},key,buf.slice(12));
@@ -474,11 +503,12 @@ async function play(g){
     const html=await decrypt(await getBytes(g),lic.k);
     cur=URL.createObjectURL(new Blob([html],{type:'text/html'}));
     $('frame').src=cur;$('ptitle').textContent=g.title;$('player').hidden=false;$('fabDona').hidden=true;history.pushState({p:1},'');
-  }catch(e){alert('No se pudo abrir el juego. Conéctate a internet una vez para descargarlo. ('+(e&&e.name==='OperationError'?'la clave no coincide con la usada al publicar este juego: vuelve a publicarlo desde el admin':(e.code||e.message||e))+')');}
+  }catch(e){alert('No se pudo abrir el juego. Conéctate a internet una vez para descargarlo. ('+(e.message||e)+')');}
 }
 function closeGame(){if(!$('player').hidden){$('player').hidden=true;if(hasDona()&&$('anun').hidden)$('fabDona').hidden=false;$('frame').src='about:blank';if(cur){URL.revokeObjectURL(cur);cur=null;}}}
 $('pback').onclick=()=>{if(history.state&&history.state.p)history.back();else closeGame();};
-addEventListener('popstate',closeGame);
+addEventListener('popstate',()=>{const was=!$('player').hidden;closeGame();if(!was&&VD.d)goHome();});
+$('dimBack').onclick=()=>{goHome();};
 addEventListener('pageshow',e=>{if(e.persisted&&hasDona()){openAnun(false);loadCamp();}});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('anun').hidden)closeAnun();else closeGame();}});
 $('code').addEventListener('input',e=>{e.target.value=normCode(e.target.value);});
@@ -489,12 +519,11 @@ $('inst').onclick=async()=>{if(deferred){deferred.prompt();deferred=null;$('inst
 addEventListener('appinstalled',()=>{$('inst').hidden=true;});
 if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!matchMedia('(display-mode: standalone)').matches)$('iosHint').hidden=false;
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
-$('stBack').onclick=()=>{dim=null;sub='*';renderLib();scrollTo(0,0);};
 renderDona();
 (async function init(){
-  if(typeof firebase!=='undefined'){try{const a=firebase.initializeApp(CFG,'juegos');auth=a.auth();db=a.firestore();try{db.settings({experimentalAutoDetectLongPolling:true,merge:true});}catch(e){}}catch(e){}}
+  if(typeof firebase!=='undefined'){try{const a=firebase.initializeApp(CFG,'juegos');auth=a.auth();db=a.firestore();}catch(e){}}
+  await loadCatalog();await loadCovers();
   lic=getLic();
-  if(!lic&&/FBAN|FBAV|FB_IAB|Instagram|TikTok|musical_ly|Snapchat|MicroMessenger|Line\//i.test(navigator.userAgent)){const w=document.createElement('div');w.className='warn';w.innerHTML='⚠️ Estás dentro de otra app (Instagram, Facebook, TikTok…). Abre este enlace en <b>Chrome</b> o <b>Safari</b> (menú ⋮ → «Abrir en el navegador») <b>antes</b> de activar tu código; si no, el código puede quedar bloqueado.';$('vAct').insertBefore(w,$('vAct').firstChild);}
   if(lic){enter();}else view('act');
   loadCamp();
   if(hasDona())setTimeout(()=>openAnun(false),600);
