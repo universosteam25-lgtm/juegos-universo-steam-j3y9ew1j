@@ -80,8 +80,25 @@ body{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 @media(prefers-reduced-motion:reduce){.prog i{animation:none;transition:none}}
 
 input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align:left;padding:13px;margin-bottom:8px}
-.campImg{width:100%;height:auto;aspect-ratio:2/1;object-fit:cover;border-radius:18px;margin:10px 0 2px;display:block;cursor:zoom-in}
-.campImg.full{aspect-ratio:auto;object-fit:contain;cursor:zoom-out;background:var(--soft)}
+.campImgW{position:relative;margin:10px 0 2px;border-radius:18px;overflow:hidden;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
+.campImg{width:100%;height:auto;aspect-ratio:2/1;object-fit:cover;display:block}
+.campDiv{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.9);box-shadow:0 0 3px rgba(0,0,0,.35);pointer-events:none}
+.campLinks{display:grid;grid-template-columns:repeat(5,1fr);margin:4px 0 2px}
+.campLinks>span{min-width:0;padding:0 2px}
+.campLk{display:flex;align-items:center;justify-content:center;text-align:center;min-height:34px;padding:5px 1px;border-radius:12px;background:linear-gradient(135deg,#FF6B9D,#9C88FF);color:#fff;font:700 9.5px/1.15 Quicksand,Arial,sans-serif;letter-spacing:-.2px;text-decoration:none;overflow:hidden;overflow-wrap:break-word;box-shadow:0 2px 0 #b84a78}
+.campLk:active{transform:translateY(1px)}
+#campLb{position:fixed;inset:0;z-index:90;background:rgba(20,10,50,.94);display:flex;align-items:center;justify-content:center;padding:max(60px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom));overflow:auto;cursor:zoom-out}
+#campLb[hidden]{display:none}
+.lbBox{display:inline-block;max-width:100%;position:relative}
+#lbImg{display:block;width:auto;height:auto;max-width:calc(100vw - 24px);max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.5);cursor:zoom-out}
+#lbX{position:fixed;top:max(12px,env(safe-area-inset-top));right:14px;z-index:2;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#5B3FD1;font:700 22px Fredoka,sans-serif;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.thx{margin:14px 0 4px;padding:16px 14px;border-radius:22px;background:linear-gradient(135deg,#FFE3EE,#E7E0FF);border:2px solid #FFC2D4;text-align:center;color:#3d2b7a}
+.thxIco{font-size:38px;line-height:1}
+.thxT{font:600 19px Fredoka,sans-serif;margin:6px 0 4px;color:#5B3FD1}
+.thx .campD{color:#3d2b7a;text-align:center}
+.thxL{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.thxL li{background:#fff;border-radius:99px;padding:5px 12px;font:700 13px Quicksand,Arial,sans-serif}
+.thxL a{color:#6B4FE0;text-decoration:none}
 .campD{font-size:14px;font-weight:600;color:var(--tx);margin:4px 0 6px;white-space:pre-wrap;text-align:left}
 .okmsg{color:#1b8a5a;font-weight:700;font-size:14px;margin-top:10px;text-align:center}
 
@@ -311,6 +328,8 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 </div>
 <button id="fabDona" hidden aria-label="Donar para apoyar el taller">💜 Donar</button>
 
+<div id="campLb" hidden role="dialog" aria-modal="true" aria-label="Imagen de la campaña"><button id="lbX" aria-label="Cerrar imagen">✕</button><div class="lbBox"><img id="lbImg" alt="Imagen de la campaña"><div class="campLinks" id="lbLinks"></div></div></div>
+
 <div id="player" hidden>
   <div id="pbar"><button id="pback">← Volver</button><span id="ptitle"></span></div>
   <iframe id="frame" title="Juego" sandbox="allow-scripts allow-same-origin allow-modals allow-forms" allow="fullscreen; autoplay"></iframe>
@@ -405,6 +424,10 @@ const STEAM=[
  {k:'E',n:'Ingeniería',e:'📐',c:'#1E9E73',p:'#C4F1DF',s:['Dibujo Técnico']},
  {k:'A',n:'Arte',e:'🎨',c:'#B58300',p:'#FFF1A8',s:['Lengua Castellana','Lectura Crítica','Inglés','Filosofía','Democracia y Constitución','Artes','Ética y Valores','Educación Religiosa','Cátedra de la Paz','Educación Física','Recreación y Deportes']},
  {k:'M',n:'Matemáticas',e:'➗',c:'#7A63E8',p:'#D5CBFF',s:['Aritmética','Álgebra','Trigonometría','Cálculo','Geometría','Estadística']}];
+const DEFD=STEAM.map(d=>({k:d.k,p:d.p,c:d.c}));
+const hexOk=h=>/^#[0-9a-f]{6}$/i.test(h||'');
+function applyCols(o){STEAM.forEach(d=>{const df=DEFD.find(x=>x.k===d.k),x=(o&&o[d.k])||{};d.p=hexOk(x.p)?x.p:df.p;d.c=hexOk(x.c)?x.c:df.c;});}
+async function loadColors(){let o={};try{o=JSON.parse(localStorage.getItem('steamjuegos_cols')||'{}');}catch(e){}applyCols(o);if(db&&navigator.onLine){try{const d=await db.doc('catalog/colors').get();o=d.exists?d.data():{};try{localStorage.setItem('steamjuegos_cols',JSON.stringify(o));}catch(e){}applyCols(o);}catch(e){}}}
 const subsOf=g=>Array.isArray(g.subs)?g.subs:(g.subj?[g.subj]:[]);
 const dimOfSub=x=>(STEAM.find(d=>d.s.includes(x))||{}).k;
 let COV={},VD={d:null,s:''};
@@ -451,9 +474,31 @@ function renderDona(){
 }
 const fmtPct=p=>String(p).replace('.',',')+'%';
 const fmtFecha=t=>new Date(t).toLocaleString('es-CO',{dateStyle:'long',timeStyle:'short'});
-document.addEventListener('click',e=>{const i=e.target.closest&&e.target.closest('.campImg');if(i)i.classList.toggle('full');});
-function campHtml(c,img){return c&&c.on!==false&&typeof c.pct==='number'?(img&&/^data:image\/jpeg;base64,/.test(img)?'<img class="campImg" alt="Imagen de la campaña. Toca para verla completa" title="Toca para ver completa" src="'+img+'">':'')+'<p class="campT">'+esc(c.title||'Nuestra campaña')+'</p>'+(c.desc?'<p class="campD">'+esc(c.desc)+'</p>':'')+'<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+c.pct+'"><i data-w="'+c.pct+'"></i><b>'+fmtPct(c.pct)+'</b></div><p class="campN">Esta barra se actualiza todos los días.<br>Última actualización: '+esc(fmtFecha(c.updatedAt||Date.now()))+'</p>':'';}
-function showCamp(c,img){['anCamp','campBox'].forEach(id=>{const e=$(id);e.innerHTML=campHtml(c,img);e.querySelectorAll('i[data-w]').forEach(i=>requestAnimationFrame(()=>requestAnimationFrame(()=>{i.style.width=i.dataset.w+'%';})));});}
+let CAMPLAST={img:'',links:[]};
+const okUrl=u=>/^https?:\/\/[^\s"'<>]+$/i.test(u||'');
+const lkCells=L=>[0,1,2,3,4].map(i=>{const x=(L&&L[i])||{};return okUrl(x.u)?'<span><a class="campLk" target="_blank" rel="noopener noreferrer nofollow" href="'+esc(x.u)+'">'+esc(x.n||'Visitar')+'</a></span>':'<span></span>';}).join('');
+const hasLk=L=>Array.isArray(L)&&L.some(x=>x&&okUrl(x.u));
+function openCampLb(){if(!CAMPLAST.img)return;$('lbImg').src=CAMPLAST.img;$('lbLinks').innerHTML=hasLk(CAMPLAST.links)?lkCells(CAMPLAST.links):'';$('campLb').hidden=false;}
+function closeCampLb(){$('campLb').hidden=true;}
+document.addEventListener('click',e=>{
+  if(!e.target.closest)return;
+  if(e.target.closest('#campLb')){if(e.target.closest('a'))return;closeCampLb();return;}
+  if(e.target.closest('.campImgW'))openCampLb();
+});
+function thanksHtml(t){
+  if(!t||!t.on)return'';const L=(t.list||[]).filter(x=>x&&x.n);
+  return '<div class="thx"><div class="thxIco">💜</div><p class="thxT">'+esc(t.title||'¡Gracias por apoyar a Universo STEAM!')+'</p>'+(t.msg?'<p class="campD">'+esc(t.msg)+'</p>':'')+(L.length?'<ul class="thxL">'+L.map(x=>'<li>'+(okUrl(x.u)?'<a target="_blank" rel="noopener noreferrer nofollow" href="'+esc(x.u)+'">'+esc(x.n)+' 🔗</a>':esc(x.n))+'</li>').join('')+'</ul>':'')+'</div>';
+}
+function campHtml(c,img){
+  if(!c)return'';let h='';
+  if(c.on!==false&&typeof c.pct==='number'){
+    const lk=hasLk(c.links);
+    h+=(img&&/^data:image\/jpeg;base64,/.test(img)?'<div class="campImgW" title="Toca para ver la imagen completa"><img class="campImg" alt="Imagen de la campaña. Toca para verla completa" src="'+img+'">'+(lk?'<i class="campDiv" style="left:20%"></i><i class="campDiv" style="left:40%"></i><i class="campDiv" style="left:60%"></i><i class="campDiv" style="left:80%"></i>':'')+'</div>'+(lk?'<div class="campLinks">'+lkCells(c.links)+'</div>':''):'')
+     +'<p class="campT">'+esc(c.title||'Nuestra campaña')+'</p>'+(c.desc?'<p class="campD">'+esc(c.desc)+'</p>':'')+'<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+c.pct+'"><i data-w="'+c.pct+'"></i><b>'+fmtPct(c.pct)+'</b></div><p class="campN">Esta barra se actualiza todos los días.<br>Última actualización: '+esc(fmtFecha(c.updatedAt||Date.now()))+'</p>';
+  }
+  return h+thanksHtml(c.thanks);
+}
+function showCamp(c,img){CAMPLAST={img:(c&&c.on!==false&&typeof c.pct==='number'&&img)||'',links:(c&&c.links)||[]};['anCamp','campBox'].forEach(id=>{const e=$(id);e.innerHTML=campHtml(c,img);e.querySelectorAll('i[data-w]').forEach(i=>requestAnimationFrame(()=>requestAnimationFrame(()=>{i.style.width=i.dataset.w+'%';})));});}
 async function loadCamp(){
   let c=null,img=null;try{c=JSON.parse(localStorage.getItem('steamjuegos_camp')||'null');img=localStorage.getItem('steamjuegos_campimg');}catch(e){}
   showCamp(c,img);
@@ -493,7 +538,7 @@ function openAnun(det){
   $('anDonar').hidden=!!det;$('anCerrar').textContent=det?'Listo':'Cerrar';$('anun').hidden=false;
 }
 function closeAnun(){$('anun').hidden=true;if(hasDona())$('fabDona').hidden=false;}
-$('anDonar').onclick=()=>openAnun(true);$('anCerrar').onclick=closeAnun;$('anX').onclick=closeAnun;addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('anun').hidden)closeAnun();});$('fabDona').onclick=()=>{openAnun(true);loadCamp();};
+$('anDonar').onclick=()=>openAnun(true);$('anCerrar').onclick=closeAnun;$('anX').onclick=closeAnun;$('lbX').onclick=closeCampLb;$('fabDona').onclick=()=>{openAnun(true);loadCamp();};
 $('anun').addEventListener('click',e=>{if(e.target.id==='anun')closeAnun();});
 function enter(){view('lib');renderLib();revalidate();prefetch();}
 async function decrypt(buf,kb64){
@@ -514,7 +559,7 @@ $('pback').onclick=()=>{if(history.state&&history.state.p)history.back();else cl
 addEventListener('popstate',()=>{const was=!$('player').hidden;closeGame();if(!was&&VD.d)goHome();});
 $('dimBack').onclick=()=>{goHome();};
 addEventListener('pageshow',e=>{if(e.persisted&&hasDona()){openAnun(false);loadCamp();}});
-addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('anun').hidden)closeAnun();else closeGame();}});
+addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('campLb').hidden)closeCampLb();else if(!$('anun').hidden)closeAnun();else closeGame();}});
 $('code').addEventListener('input',e=>{e.target.value=normCode(e.target.value);});
 $('code').addEventListener('keydown',e=>{if(e.key==='Enter')activate();});
 $('bAct').onclick=activate;
@@ -526,7 +571,7 @@ if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventList
 renderDona();
 (async function init(){
   if(typeof firebase!=='undefined'){try{const a=firebase.initializeApp(CFG,'juegos');auth=a.auth();db=a.firestore();}catch(e){}}
-  await loadCatalog();await loadCovers();
+  await loadCatalog();await loadCovers();await loadColors();
   lic=getLic();
   if(lic){enter();}else view('act');
   loadCamp();
