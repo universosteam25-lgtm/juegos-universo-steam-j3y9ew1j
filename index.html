@@ -123,6 +123,12 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;margin-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .tabs button{flex:0 0 auto;border:2px solid var(--soft);background:var(--card);color:var(--tx);border-radius:99px;padding:9px 16px;font:600 15px Fredoka,sans-serif;cursor:pointer;white-space:nowrap}
 .tabs button.on{background:var(--fc);border-color:var(--fc);color:#fff}
+.grBar{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;margin:0 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.grBar[hidden]{display:none}
+.grBar button{flex:0 0 auto;border:2px solid var(--soft);background:var(--card);color:var(--tx);border-radius:99px;padding:8px 15px;font:600 15px Fredoka,sans-serif;cursor:pointer;white-space:nowrap}
+.grBar button.on{background:linear-gradient(135deg,#FF8FB8,#9C88FF);border-color:transparent;color:#fff}
+.grBar button small{opacity:.8;margin-left:5px}
+.gt{display:block;margin-top:4px;font-size:12px;font-weight:700;color:var(--mut,#7a6aa8)}
 .tabs button small{opacity:.8;margin-left:5px}
 .secT{font:700 18px Fredoka,sans-serif;margin:18px 0 8px;color:var(--pd)}
 </style>
@@ -130,7 +136,7 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 <body>
 <main class="wrap">
 <header>
-  <div class="logo"><svg style="width:100%;height:100%;display:block;" id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 794.29 794.29">
+  <div class="logo"><a href="https://www.tiktok.com/@universo_steam?_r=1&amp;_t=ZS-9BGizVcgebF" target="_blank" rel="noopener noreferrer" aria-label="Universo STEAM en TikTok" title="Síguenos en TikTok" style="display:block;width:100%;height:100%"><svg style="width:100%;height:100%;display:block;" id="Capa_1" data-name="Capa 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 794.29 794.29">
       <defs>
         <style>
           .cls-1 { fill: #e9fffe; }
@@ -257,7 +263,7 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
         <path class="cls-13" d="M469,319.25c-22.89-.13-23.33-22.8,0-22.53C490,296.67,490.46,319.56,469,319.25Z" transform="translate(-2.74 -3.4)"/>
         <path class="cls-7" d="M388.4,306.19c4.84.28,9.66,1.65,14.37-.56C401.3,311.58,391.44,312,388.4,306.19Z" transform="translate(-2.74 -3.4)"/>
       </g>
-    </svg></div>
+    </svg></a></div>
   <h1>Universo STEAM ✨</h1>
   <p>Juegos educativos</p>
 </header>
@@ -289,6 +295,7 @@ input.small{font:600 16px Quicksand,Arial,sans-serif;letter-spacing:0;text-align
 
 <section id="vLib" hidden>
   <div class="warn" id="needVerify" hidden>Hace tiempo que no verificamos tu código. Conéctate a internet para seguir jugando.</div>
+  <div class="grBar" id="grBar" hidden role="tablist" aria-label="Grado"></div>
   <div id="home">
     <p class="hint" style="text-align:center;margin:0 0 12px">Elige una ficha para ver sus asignaturas y juegos.</p>
     <div class="fichas" id="fichas"></div>
@@ -431,6 +438,21 @@ const DEFD=STEAM.map(d=>({k:d.k,p:d.p,c:d.c}));
 const hexOk=h=>/^#[0-9a-f]{6}$/i.test(h||'');
 function applyCols(o){STEAM.forEach(d=>{const df=DEFD.find(x=>x.k===d.k),x=(o&&o[d.k])||{};d.p=hexOk(x.p)?x.p:df.p;d.c=hexOk(x.c)?x.c:df.c;});}
 async function loadColors(){let o={};try{o=JSON.parse(localStorage.getItem('steamjuegos_cols')||'{}');}catch(e){}applyCols(o);if(db&&navigator.onLine){try{const d=await db.doc('catalog/colors').get();o=d.exists?d.data():{};try{localStorage.setItem('steamjuegos_cols',JSON.stringify(o));}catch(e){}applyCols(o);}catch(e){}}}
+const GRADES=[{id:'pi',n:'Primera infancia',e:'🧸'}].concat(Array.from({length:11},(_,i)=>({id:String(i+1),n:(i+1)+'.°',e:'🎒'})));
+const gradesOf=g=>Array.isArray(g.grades)?GRADES.map(x=>x.id).filter(id=>g.grades.includes(id)):[];
+const gradeLabel=g=>{const L=gradesOf(g);if(!L.length)return'';if(L.length===GRADES.length)return'Todos los grados';const out=[];if(L.includes('pi'))out.push('Primera infancia');const nums=L.filter(x=>x!=='pi').map(Number);for(let i=0;i<nums.length;){let j=i;while(j+1<nums.length&&nums[j+1]===nums[j]+1)j++;out.push(j-i>=2?nums[i]+'.° a '+nums[j]+'.°':nums.slice(i,j+1).map(x=>x+'.°').join(' · '));i=j+1;}return out.join(' · ');};
+let GR='';try{GR=localStorage.getItem('steamjuegos_grade')||'';}catch(e){}
+const gradesAvail=()=>GRADES.filter(x=>CAT.some(g=>gradesOf(g).includes(x.id)));
+const inGrade=g=>!GR||gradesOf(g).includes(GR);
+function renderGrBar(){
+  const av=gradesAvail(),bar=$('grBar');
+  if(GR&&!av.some(x=>x.id===GR)){GR='';try{localStorage.removeItem('steamjuegos_grade');}catch(e){}}
+  bar.hidden=!av.length;if(!av.length)return;
+  const cnt=id=>CAT.filter(g=>id?gradesOf(g).includes(id):true).length;
+  bar.innerHTML=[{id:'',n:'Todos',e:'🌈'},...av].map(x=>'<button role="tab" class="'+(GR===x.id?'on':'')+'" data-g="'+x.id+'">'+x.e+' '+esc(x.n)+'<small>'+cnt(x.id)+'</small></button>').join('');
+  bar.querySelectorAll('button').forEach(b=>b.onclick=()=>{GR=b.dataset.g;try{GR?localStorage.setItem('steamjuegos_grade',GR):localStorage.removeItem('steamjuegos_grade');}catch(e){}renderLib();});
+  const on=bar.querySelector('button.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
+}
 const subsOf=g=>Array.isArray(g.subs)?g.subs:(g.subj?[g.subj]:[]);
 const dimOfSub=x=>(STEAM.find(d=>d.s.includes(x))||{}).k;
 let COV={},VD={d:null,s:''};
@@ -439,18 +461,18 @@ async function loadCovers(){
   if(db&&navigator.onLine){try{const d=await db.doc('catalog/covers').get();COV=d.exists?d.data():{};try{localStorage.setItem('steamjuegos_covers',JSON.stringify(COV));}catch(e){}}catch(e){}}
 }
 const dimOf=k=>STEAM.find(x=>x.k===k);
-const gamesOf=(k,sub)=>CAT.map((g,i)=>({g,i})).filter(x=>subsOf(x.g).some(y=>dimOfSub(y)===k&&(!sub||y===sub)));
+const gamesOf=(k,sub)=>CAT.map((g,i)=>({g,i})).filter(x=>inGrade(x.g)&&subsOf(x.g).some(y=>dimOfSub(y)===k&&(!sub||y===sub)));
 function gameCard(g,i,d){
   d=d||dimOf(dimOfSub(subsOf(g)[0]));
   const st=d?' style="--gp:'+d.p+';--gc:'+d.c+'"':'';
-  return '<div class="g'+(d?' gc':'')+'"'+st+'><div class="e"'+(d?'':' style="background:'+esc(g.color||'#9C88FF')+'22"')+'>'+esc(g.emoji||'🎮')+'</div><h3>'+esc(g.title)+'</h3><p>'+esc(g.desc||'')+'</p><button class="btn" data-i="'+i+'">▶ Jugar</button></div>';
+  return '<div class="g'+(d?' gc':'')+'"'+st+'><div class="e"'+(d?'':' style="background:'+esc(g.color||'#9C88FF')+'22"')+'>'+esc(g.emoji||'🎮')+'</div><h3>'+esc(g.title)+'</h3><p>'+esc(g.desc||'')+'</p>'+(gradeLabel(g)?'<span class="gt">🎓 '+esc(gradeLabel(g))+'</span>':'')+'<button class="btn" data-i="'+i+'">▶ Jugar</button></div>';
 }
 function bindPlay(root){root.querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>play(CAT[+b.dataset.i]));}
 function renderHome(){
   $('fichas').innerHTML=STEAM.map(d=>{const n=gamesOf(d.k).length,img=COV[d.k]&&/^data:image\//.test(COV[d.k])?'<img alt="" src="'+COV[d.k]+'">':'';
     return '<button class="ficha" data-k="'+d.k+'" style="--fc:'+d.c+';--fp:'+d.p+'"><div class="fIn"><div class="fCir">'+(img?img+'<span class="fLet">'+d.k+'</span>':'<b>'+d.k+'</b>')+'</div><div class="fName">'+d.n+'</div><div class="fSubj">'+d.s.map(esc).join(' · ')+'</div></div><span class="fCount">'+n+' juego'+(n===1?'':'s')+'</span></button>';}).join('');
   $('fichas').querySelectorAll('.ficha').forEach(b=>b.onclick=()=>openDim(b.dataset.k,true));
-  const otros=CAT.map((g,i)=>({g,i})).filter(x=>!subsOf(x.g).some(y=>dimOfSub(y)));
+  const otros=CAT.map((g,i)=>({g,i})).filter(x=>inGrade(x.g)&&!subsOf(x.g).some(y=>dimOfSub(y)));
   $('otros').hidden=!otros.length;$('gridOtros').innerHTML=otros.map(x=>gameCard(x.g,x.i,null)).join('');bindPlay($('gridOtros'));
 }
 function renderDim(){
@@ -460,7 +482,7 @@ function renderDim(){
   $('tabs').innerHTML=tabs.map(t=>'<button role="tab" class="'+(VD.s===t.s?'on':'')+'" data-s="'+esc(t.s)+'" style="'+(t.n?'':'opacity:.55')+'">'+esc(t.l)+'<small>'+t.n+'</small></button>').join('');
   $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{VD.s=b.dataset.s;renderDim();});
   const L=gamesOf(d.k,VD.s);
-  $('grid').innerHTML=L.length?L.map(x=>gameCard(x.g,x.i,d)).join(''):'<div class="card hint" style="grid-column:1/-1;text-align:center">Pronto habrá juegos de '+esc(VD.s||d.n)+' ✨</div>';
+  $('grid').innerHTML=L.length?L.map(x=>gameCard(x.g,x.i,d)).join(''):'<div class="card hint" style="grid-column:1/-1;text-align:center">Pronto habrá juegos de '+esc(VD.s||d.n)+(GR?' para '+esc((GRADES.find(x=>x.id===GR)||{}).n||'este grado'):'')+' ✨</div>';
   bindPlay($('grid'));
   const on=$('tabs').querySelector('button.on');if(on&&on.scrollIntoView)on.scrollIntoView({inline:'center',block:'nearest'});
 }
@@ -468,6 +490,7 @@ function openDim(k,push){VD={d:k,s:''};$('home').hidden=true;$('dimv').hidden=fa
 function goHome(){VD={d:null,s:''};$('dimv').hidden=true;$('home').hidden=false;renderHome();window.scrollTo(0,0);}
 function renderLib(){
   $('lcode').textContent='••••-••••-'+lic.code.slice(-4);
+  renderGrBar();
   if(VD.d)renderDim();else renderHome();
 }
 const donaExtra=()=>(DONA.nombre?'<p class="hint" style="margin:10px 0 0">Al pagar verás el nombre <b>«'+esc(DONA.nombre)+'»</b>.</p>':'')+(DONA.qr?'<p class="hint" style="margin:12px 0 4px">O escanea este código QR con la app de tu banco o billetera:</p><img class="qrImg" alt="Código QR para donar por Bre-B" src="'+esc(DONA.qr)+'">':'');
